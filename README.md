@@ -21,8 +21,12 @@ Then open the printed URL in Chrome or Edge (best Web Speech support).
 - **Avatar** — a [Ready Player Me](https://readyplayer.me) GLB with ARKit blendshapes and
   Oculus visemes, loaded with Three.js. Skin/outfit materials are restyled into a grey,
   satin "robot skin" and dark metal body.
-- **Lip-sync** — Web Speech API `SpeechSynthesis` word-boundary events drive a letter→viseme
-  mapping (`avatar.js`), so the mouth shapes match the spoken text.
+- **Voice** — [Kokoro-82M](https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX) neural TTS
+  running fully in the browser via `kokoro-js` (free, no key; ~90 MB downloaded once, WebGPU when
+  available). Voice `af_heart` — a warm, natural female voice. Falls back to the best female
+  Web Speech voice (Edge "Aria Natural", Chrome "Google US English") if the model cannot load.
+- **Lip-sync** — word timing is spread over the real audio duration and mapped letter→viseme
+  (`avatar.js`); the jaw is additionally driven by the live audio loudness.
 - **Life** — procedural blinking, eye saccades, cursor tracking (eyes + head + neck),
   breathing, nodding while speaking, mood blendshapes (neutral / happy / think / surprise / sad).
 - **Gestures** — arm poses (point, explain, wave, think, self) interpolated on the

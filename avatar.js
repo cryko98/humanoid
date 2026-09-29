@@ -265,7 +265,9 @@ export class Avatar {
       const on = vis === v && vis !== 'sil';
       this.setTarget('viseme_' + vis, on ? (VOWELS.has(vis) ? 0.85 : 0.7) : 0);
     }
-    this.setTarget('jawOpen', v !== 'sil' && VOWELS.has(v) ? 0.25 : 0.03);
+    // jaw: viseme baseline, boosted by the real audio loudness when a neural voice is playing
+    const lvl = this.speaking && this.audioLevel ? this.audioLevel() : 0;
+    this.setTarget('jawOpen', clamp((v !== 'sil' && VOWELS.has(v) ? 0.22 : 0.03) + lvl * 0.35, 0, 0.6));
   }
 
   // ---- main loop ----

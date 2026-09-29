@@ -1,4 +1,5 @@
 import { Avatar } from './avatar.js';
+import { NeuralVoice } from './voice.js';
 
 const $ = s => document.querySelector(s);
 const messages = $('#messages'), input = $('#textInput'), form = $('#inputBar');
@@ -52,15 +53,26 @@ function addMsg(who, text) {
 
 // ---------- TTS ----------
 let muted = false, voice = null;
+const neural = new NeuralVoice({ onProgress: (msg, pct) => {
+  if (msg) { $('#voiceName').textContent = msg; $('#hudVoice').textContent = pct >= 100 ? 'NEURAL' : pct.toFixed(0) + '%'; }
+  else pickVoice();
+} });
+neural.init();
+avatar.audioLevel = () => neural.level();
+const FEMALE = /aria|jenny|zira|samantha|ava|emma|sonia|libby|michelle|ana|google us english|female|woman/i;
 function pickVoice() {
-  const vs = speechSynthesis.getVoices();
-  voice = vs.find(v => v.lang.startsWith('en') && /natural|online|neural/i.test(v.name))
-       || vs.find(v => v.lang === 'en-US') || vs.find(v => v.lang.startsWith('en')) || vs.find(v => v.default) || vs[0] || null;
-  $('#voiceName').textContent = voice ? voice.name.replace(/Microsoft |Google /, '') : 'no voice available';
-  $('#hudVoice').textContent = voice ? voice.lang : '—';
+  const vs = speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+  voice = vs.find(v => FEMALE.test(v.name) && /natural|online|neural/i.test(v.name))
+       || vs.find(v => FEMALE.test(v.name))
+       || vs.find(v => /natural|online|neural/i.test(v.name))
+       || vs.find(v => v.lang === 'en-US') || vs[0] || speechSynthesis.getVoices()[0] || null;
+  if (!neural.ready) {
+    $('#voiceName').textContent = voice ? voice.name.replace(/Microsoft |Google /, '') : 'no voice available';
+    $('#hudVoice').textContent = voice ? voice.lang : '—';
+  }
 }
 speechSynthesis.onvoiceschanged = pickVoice; pickVoice();
-muteBtn.onclick = () => { muted = !muted; muteBtn.textContent = muted ? '🔇 Voice off' : '🔊 Voice on'; if (muted) speechSynthesis.cancel(); };
+muteBtn.onclick = () => { muted = !muted; muteBtn.textContent = muted ? '🔇 Voice off' : '🔊 Voice on'; if (muted) { speechSynthesis.cancel(); neural.cancel(); } };
 
 function speak(text) {
   return new Promise(resolve => {
@@ -71,6 +83,14 @@ function speak(text) {
       const words = text.split(/\s+/); let t = 0;
       words.forEach(w => { setTimeout(() => avatar.speakWord(w, w.length * 70 + 60), t); t += w.length * 70 + 60; });
       setTimeout(() => { avatar.stopSpeaking(); subtitle.classList.remove('show'); resolve(); }, t + 200);
+      return;
+    }
+    if (neural.ready) {
+      neural.speak(text, {
+        onStart: () => avatar.startSpeaking(),
+        onWord: (w, d) => avatar.speakWord(w, d),
+        onEnd: () => { avatar.stopSpeaking(); subtitle.classList.remove('show'); resolve(); },
+      }).catch(err => { console.warn(err); avatar.stopSpeaking(); subtitle.classList.remove('show'); resolve(); });
       return;
     }
     speechSynthesis.cancel();
@@ -171,7 +191,7 @@ if (SR) {
   rec.onerror = () => { listening = false; micBtn.classList.remove('active'); };
   micBtn.onclick = () => {
     if (listening) { rec.stop(); return; }
-    speechSynthesis.cancel();
+    speechSynthesis.cancel(); neural.cancel();
     try { rec.start(); listening = true; micBtn.classList.add('active'); avatar.setListening(true); }
     catch (e) { console.warn(e); }
   };
