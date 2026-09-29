@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA — Humanoid AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bg-grid"></div>
+<div id="particles"></div>
+
+<header>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    <span class="logo-text">NOVA<span class="thin">.AI</span></span>
+  </div>
+  <div class="status">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText">IDLE</span>
+  </div>
+</header>
+
+<main>
+  <section id="stage">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+    <div class="ring ring-3"></div>
+    <canvas id="head"></canvas>
+    <div class="hud hud-tl"><span>NEURAL CORE</span><b id="hudCore">98.2%</b></div>
+    <div class="hud hud-tr"><span>LATENCY</span><b id="hudLat">12 ms</b></div>
+    <div class="hud hud-bl"><span>EMOTION</span><b id="hudEmo">NEUTRAL</b></div>
+    <div class="hud hud-br"><span>VOICE</span><b id="hudVoice">—</b></div>
+    <div id="subtitle"></div>
+  </section>
+
+  <section id="chat">
+    <div id="messages">
+      <div class="msg ai">
+        <div class="bubble">Welcome. I am NOVA, your digital assistant. Type or talk to me — I am listening.</div>
+      </div>
+    </div>
+    <form id="inputBar" autocomplete="off">
+      <button type="button" id="micBtn" title="Speak">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </button>
+      <input id="textInput" type="text" placeholder="Say something to NOVA…" />
+      <button type="submit" id="sendBtn" title="Send">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </form>
+    <div class="hint">Voice: <span id="voiceName">loading…</span> · <button id="muteBtn" type="button">🔊 Voice on</button> · <button id="avatarBtn" type="button">👤 Avatar URL</button></div>
+  </section>
+</main>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
